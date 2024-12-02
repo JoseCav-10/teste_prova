@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block parte_central %}
+
+<h1>Confirmar Exclusão</h1>
+<p>Tem certeza de que deseja excluir "{{ object.nome }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirmar</button>
+</form>
+<a href="{% url 'list_categoria' %}">Cancelar</a>
+
+
+{% endblock %}

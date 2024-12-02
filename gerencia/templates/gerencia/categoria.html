@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block parte_central %}
+
+<h1>Categorias</h1>
+<h1>Lista de Categorias</h1>
+<a href="{% url 'cre' %}">Nova Categoria</a>
+
+<form method="get" action="{% url 'list_categoria' %}">
+    <input type="text" name="q" placeholder="Buscar por nome" value="{{ request.GET.q }}">
+    <button type="submit">Buscar</button>
+</form>
+
+<h2>Lista de Categorias</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for categoria in categorias %}
+        <tr>
+            <td>{{ categoria.nome }}</td>
+            <td>
+                <!-- Links para editar ou excluir a categoria, por exemplo -->
+                <a href="{% url 'upd' categoria.id %}">Editar</a>
+                <a href="{% url 'del' categoria.id %}">Excluir</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">Nenhuma categoria encontrada.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Paginação, se necessário -->
+<div class="pagination">
+    <span class="step-links">
+        {% if categorias.has_previous %}
+            <a href="?q={{ request.GET.q }}&page=1">&laquo; primeira</a>
+            <a href="?q={{ request.GET.q }}&page={{ categorias.previous_page_number }}">anterior</a>
+        {% endif %}
+        <span class="current">
+            Página {{ categorias.number }} de {{ categorias.paginator.num_pages }}.
+        </span>
+        {% if categorias.has_next %}
+            <a href="?q={{ request.GET.q }}&page={{ categorias.next_page_number }}">próxima</a>
+            <a href="?q={{ request.GET.q }}&page={{ categorias.paginator.num_pages }}">última &raquo;</a>
+        {% endif %}
+    </span>
+
+{% endblock %}

@@ -1,8 +1,11 @@
 from django.shortcuts import render,redirect
-from .forms import NoticiaForm, NoticiaFilterForm
+from .forms import NoticiaForm, NoticiaFilterForm, CategoriaForm
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import Noticia, Categoria
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 @login_required
@@ -89,3 +92,42 @@ def index(request):
         'search_query': search_query,
     }
     return render(request, 'gerencia/index.html', contexto)
+
+
+class CategoriaCreateView(CreateView, LoginRequiredMixin):
+    model = Categoria
+    form_class = CategoriaForm
+    template_name = 'gerencia/categoria_form.html'
+    success_url = reverse_lazy('list_categoria')
+    login_url = "login"
+
+# Editar categoria
+class CategoriaUpdateView(UpdateView, LoginRequiredMixin):
+    model = Categoria
+    form_class = CategoriaForm
+    template_name = 'gerencia/categoria_form.html'
+    success_url = reverse_lazy('list_categoria')
+    login_url = "login"
+
+# Excluir categoria
+class CategoriaDeleteView(DeleteView, LoginRequiredMixin):
+    model = Categoria
+    template_name = 'gerencia/categoria_confirm_delete.html'
+    success_url = reverse_lazy('list_categoria')
+    login_url = "login"
+
+
+class CategoriaListView(ListView, LoginRequiredMixin):
+    model = Categoria
+    template_name = 'categoria_list.html'
+    context_object_name = 'categorias'
+    paginate_by = 10  # Adicione a paginação, se necessário
+    ordering = "nome"
+    login_url = "login"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.GET.get('q', '')
+        if search_query:
+            queryset = queryset.filter(nome__icontains=search_query)
+        return queryset
